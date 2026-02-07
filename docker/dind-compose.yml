@@ -1,0 +1,107 @@
+version: '2'
+services:
+    nginx:
+        build: nginx
+        container_name: fzk-nginx
+        ports:
+            - '8080:80'
+        links:
+            - php
+        volumes_from:
+            - php
+        volumes:
+            - ./logs/nginx/:/var/log/nginx:cached
+        command: [nginx-debug, '-g', 'daemon off;']
+    php:
+        build: php-fpm
+        container_name: fzk-php
+        environment:
+            - COMPOSER_MEMORY_LIMIT=-1
+        ports:
+            - '9002:9000'
+        volumes:
+            - /builds/fzk/webapp:/var/www/html:cached
+            - ./storage/logs:/var/www/html/storage/logs:cached
+            - ./php-fpm/upload.ini:/usr/local/etc/php/conf.d/upload.ini
+        links:
+            - postgres
+    postgres:
+        image: 'postgres:11.7'
+        container_name: fzk-postgres
+        ports:
+            - '5433:5432'
+        environment:
+            POSTGRES_USER: fzk
+            POSTGRES_PASSWORD: fzk
+            POSTGRES_EXTENSIONS: citext
+    redis:
+        image: 'redis'
+        container_name: fzk-redis
+        ports:
+            - '6379:6379'
+
+    adminer:
+        image: adminer
+        container_name: fzk-adminer
+        restart: always
+        ports:
+            - 8081:8080
+        environment:
+            ADMINER_DESIGN: pepa-linha
+
+    mailhog:
+        image: mailhog/mailhog
+        container_name: fzk-mailhog
+        ports:
+            - "1025:1025"
+            - "8025:8025"
+
+    chrome:
+        image: selenium/node-chrome:4.0.0-20211025
+        container_name: fzk-chrome
+        shm_size: 2gb
+        depends_on:
+        - selenium-hub
+        environment:
+        - SE_EVENT_BUS_HOST=selenium-hub
+        - SE_EVENT_BUS_PUBLISH_PORT=4442
+        - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+        - SE_NODE_GRID_URL=http://localhost:4444
+        ports:
+        - "6900:5900"
+
+    edge:
+        image: selenium/node-edge:4.0.0-20211025
+        container_name: fzk-edge
+        shm_size: 2gb
+        depends_on:
+        - selenium-hub
+        environment:
+        - SE_EVENT_BUS_HOST=selenium-hub
+        - SE_EVENT_BUS_PUBLISH_PORT=4442
+        - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+        - SE_NODE_GRID_URL=http://localhost:4444
+        ports:
+        - "6901:5900"
+
+    firefox:
+        image: selenium/node-firefox:4.0.0-20211025
+        container_name: fzk-firefox
+        shm_size: 2gb
+        depends_on:
+        - selenium-hub
+        environment:
+        - SE_EVENT_BUS_HOST=selenium-hub
+        - SE_EVENT_BUS_PUBLISH_PORT=4442
+        - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+        - SE_NODE_GRID_URL=http://localhost:4444
+        ports:
+        - "6902:5900"
+
+    selenium-hub:
+        image: selenium/hub:4.0.0-20211025
+        container_name: fzk-selenium
+        ports:
+        - "4442:4442"
+        - "4443:4443"
+        - "4444:4444"

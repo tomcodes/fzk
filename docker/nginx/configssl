@@ -1,0 +1,8 @@
+[dn]
+CN=fzk.test
+[req]
+distinguished_name = dn
+[EXT]
+subjectAltName=DNS:fzk.test
+keyUsage=digitalSignature
+extendedKeyUsage=serverAuth

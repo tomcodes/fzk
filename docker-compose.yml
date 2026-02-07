@@ -1,0 +1,115 @@
+version: '3'
+services:
+    fzk-nginx:
+        build: ./docker/nginx
+        container_name: fzk-nginx
+        ports:
+            - 443:443
+        volumes_from:
+            - fzk-php
+        volumes:
+            - ./docker/logs/nginx/:/var/log/nginx:cached
+        command: [nginx-debug, '-g', 'daemon off;']
+        labels:
+            - "traefik.enable=true"
+            - "traefik.backend=fzk-nginx"
+            - "traefik.docker.network=reverse-proxy"
+            - "traefik.http.routers.fzknginx.rule=Host(`fzk.test`) || Host(`rdv.fzk.test`)"
+            - "traefik.http.routers.fzknginx.priority=1"
+        networks:
+            - fzk
+            - reverse-proxy
+    fzk-php:
+        build: ./docker/php-fpm
+        container_name: fzk-php
+        environment:
+            - COMPOSER_MEMORY_LIMIT=-1
+        volumes:
+            - .:/var/www/html:cached
+            - ./docker/storage/logs:/var/www/html/storage/logs:cached
+            - ./docker/php-fpm/upload.ini:/usr/local/etc/php/conf.d/upload.ini
+        ports:
+            - "6001:6001"
+#            - "5173:5173"
+        extra_hosts:
+            - "ws.fzk.test:172.17.0.1"
+        networks:
+            - fzk
+            - reverse-proxy
+            - reverb-network
+        cap_add:
+            - NET_RAW
+            - NET_ADMIN
+    fzk-postgres:
+        image: 'postgis/postgis:15-3.4'
+        container_name: fzk-postgres
+        environment:
+            POSTGRES_USER: fzk
+            POSTGRES_PASSWORD: fzk
+            POSTGRES_EXTENSIONS: citext
+        ports:
+            - '5432:5432'
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+        networks:
+            - fzk
+    fzk-redis:
+        image: 'redis:7.0.15'
+        #build: ./docker/redis
+        container_name: fzk-redis
+        volumes:
+            - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+        networks:
+            - fzk
+    redis-commander:
+        image: rediscommander/redis-commander
+        container_name: fzk-redis-commander
+        restart: always
+        ports:
+            - '8081:8081'
+        networks:
+            - fzk
+        environment:
+            - REDIS_HOSTS=horizon:fzk-redis:6379:0,app:fzk-redis:6379:1
+    fzk-adminer:
+        image: adminer:latest
+        container_name: fzk-adminer
+        restart: always
+        environment:
+            ADMINER_DESIGN: pepa-linha
+            ADMINER_DEFAULT_SERVER: fzk-postgres
+        labels:
+            - "traefik.enable=true"
+            - "traefik.backend=fzk-adminer"
+            - "traefik.docker.network=reverse-proxy"
+            - "traefik.http.routers.fzkadminer.rule=Host(`adminer.fzk.test`)"
+            - "traefik.http.routers.fzkadminer.priority=3"
+        networks:
+            - fzk
+            - reverse-proxy
+    fzk-mailpit:
+        image: axllent/mailpit
+        container_name: fzk-mailpit
+        labels:
+            - "traefik.enable=true"
+            - "traefik.backend=fzk-mailpit"
+            - "traefik.docker.network=reverse-proxy"
+            - "traefik.http.routers.fzkmailpit.rule=Host(`mailpit.fzk.test`)"
+            - "traefik.http.routers.fzkmailpit.priority=2"
+            - "traefik.http.services.fzkmailpit.loadbalancer.server.port=8025"
+        networks:
+            - fzk
+            - reverse-proxy
+volumes:
+    pgdata:
+    meilisearchdata:
+networks:
+    fzk:
+        driver: bridge
+        name: fzk
+    reverse-proxy:
+        external: true
+        name: reverse-proxy
+    reverb-network:
+        driver: bridge
+        name: reverb
