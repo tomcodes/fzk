@@ -30,7 +30,7 @@ services:
             - ./docker/php-fpm/upload.ini:/usr/local/etc/php/conf.d/upload.ini
         ports:
             - "6001:6001"
-#            - "5173:5173"
+            - "5173:5173"
         extra_hosts:
             - "ws.fzk.test:172.17.0.1"
         networks:
