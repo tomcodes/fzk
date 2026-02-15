@@ -3,6 +3,11 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
 import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-vue-next';
+import NavBar from '@/components/NavBar.vue';
+import { login, register } from '@/routes';
+import FrazalakonCard from '@/components/FrazalakonCard.vue';
+import type { PaginatedData } from '@/components/FzkPagination.vue';
 import {
     Pagination,
     PaginationContent,
@@ -14,21 +19,6 @@ import {
     PaginationPrevious,
 } from '@/components/ui/pagination';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-vue-next';
-import NavBar from '@/components/NavBar.vue';
-import { login, register } from '@/routes';
-import FrazalakonCard from '@/components/FrazalakonCard.vue';
-import type { Frazalakon } from '@/components/FrazalakonCard.vue';
-
-interface PaginatedData {
-    data: Frazalakon[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    next_page_url: string | null;
-    prev_page_url: string | null;
-}
 
 const props = withDefaults(
     defineProps<{
@@ -125,7 +115,6 @@ function goToPage(page: number) {
 
             <Pagination
                 v-if="frazalakons.last_page > 1"
-                v-slot="{ page }"
                 :items-per-page="frazalakons.per_page"
                 :total="frazalakons.total"
                 :default-page="frazalakons.current_page"
@@ -135,13 +124,8 @@ function goToPage(page: number) {
                 <PaginationContent v-slot="{ items }">
                     <PaginationFirst @click="goToPage(1)" />
                     <PaginationPrevious
-                        @click="
-                            goToPage(
-                                Math.max(frazalakons.current_page - 1, 1),
-                            )
-                        "
+                        @click="goToPage(Math.max(frazalakons.current_page - 1, 1))"
                     />
-
                     <template v-for="(item, index) in items" :key="index">
                         <PaginationItem
                             v-if="item.type === 'page'"
@@ -149,37 +133,19 @@ function goToPage(page: number) {
                             as-child
                         >
                             <Button
-                                :variant="
-                                    item.value === frazalakons.current_page
-                                        ? 'default'
-                                        : 'outline'
-                                "
+                                :variant="item.value === frazalakons.current_page ? 'default' : 'outline'"
                                 class="h-9 w-9 p-0"
                                 @click="goToPage(item.value)"
                             >
                                 {{ item.value }}
                             </Button>
                         </PaginationItem>
-                        <PaginationEllipsis
-                            v-else
-                            :key="item.type"
-                            :index="index"
-                        />
+                        <PaginationEllipsis v-else :key="item.type" :index="index" />
                     </template>
-
                     <PaginationNext
-                        @click="
-                            goToPage(
-                                Math.min(
-                                    frazalakons.current_page + 1,
-                                    frazalakons.last_page,
-                                ),
-                            )
-                        "
+                        @click="goToPage(Math.min(frazalakons.current_page + 1, frazalakons.last_page))"
                     />
-                    <PaginationLast
-                        @click="goToPage(frazalakons.last_page)"
-                    />
+                    <PaginationLast @click="goToPage(frazalakons.last_page)" />
                 </PaginationContent>
             </Pagination>
         </main>

@@ -10,17 +10,19 @@ const props = defineProps<{
 }>();
 
 function goToPage(page: number) {
-    router.get('/top-47', { page }, { preserveState: true, preserveScroll: false });
+    router.get('/admin/pending', { page }, { preserveState: true, preserveScroll: false });
 }
 </script>
 
 <template>
-    <Head title="Top 47 — Frazalakon" />
+    <Head title="Dernières fzk" />
     <div class="min-h-screen bg-background text-foreground">
         <NavBar />
 
         <main class="mx-auto max-w-3xl px-4 py-8">
-            <h2 class="mb-6 text-xl font-semibold">Top 47</h2>
+            <h1 class="mb-6 text-xl font-semibold">
+                Dernières fzk non publiées ({{ frazalakons.total }})
+            </h1>
 
             <div class="space-y-4">
                 <Link
@@ -29,7 +31,7 @@ function goToPage(page: number) {
                     :href="`/${fzk.slug}`"
                     class="block"
                 >
-                    <div class="rounded-lg border border-border p-4 transition-colors hover:border-primary hover:bg-primary/15">
+                    <div class="rounded-lg border border-dashed border-primary/50 p-4 transition-colors hover:border-primary hover:bg-primary/15">
                         <FrazalakonCard :frazalakon="fzk" />
                     </div>
                 </Link>
@@ -39,7 +41,7 @@ function goToPage(page: number) {
                 v-if="frazalakons.data.length === 0"
                 class="py-12 text-center text-muted-foreground"
             >
-                Aucun frazalakon pour le moment.
+                Aucune frazalakon en attente.
             </p>
 
             <FzkPagination :paginated="frazalakons" @navigate="goToPage" />

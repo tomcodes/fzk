@@ -18,7 +18,7 @@ class Frazalakon extends Model
         'where',
         'when',
         'author',
-        'validated_at',
+        'published_at',
         'public',
         'heart_count',
     ];
@@ -37,7 +37,7 @@ class Frazalakon extends Model
     {
         return [
             'when' => 'datetime',
-            'validated_at' => 'datetime',
+            'published_at' => 'datetime',
             'public' => 'boolean',
         ];
     }

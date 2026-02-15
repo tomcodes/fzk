@@ -4,6 +4,7 @@
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../../node_modules/vue-sonner';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -166,5 +167,8 @@
     }
     body {
         @apply bg-background text-foreground;
+    }
+    a, button, [role="button"], [type="button"], [type="submit"], [type="reset"], label[for], summary, [tabindex]:not([tabindex="-1"]) {
+        cursor: pointer;
     }
 }

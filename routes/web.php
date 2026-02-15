@@ -11,7 +11,7 @@ Route::get('/', function (Request $request) {
     $user = Auth::user();
 
     $frazalakons = Frazalakon::query()
-        ->when(! $user, fn ($q) => $q->where('public', true))
+        ->when(! $user?->is_admin, fn ($q) => $q->where('public', true))
         ->when($request->search, fn ($q, $search) => $q->where(function ($q) use ($search) {
             $q->whereRaw('body ilike ?', ["%{$search}%"])
                 ->orWhereRaw('who ilike ?', ["%{$search}%"])
@@ -20,7 +20,7 @@ Route::get('/', function (Request $request) {
                 ->orWhereRaw('"where" ilike ?', ["%{$search}%"])
                 ->orWhereRaw('author ilike ?', ["%{$search}%"]);
         }))
-        ->latest('created_at')
+        ->latest('published_at')
         ->paginate(20)
         ->withQueryString();
 
@@ -46,14 +46,14 @@ Route::get('/top-47', function () {
     $user = Auth::user();
 
     $frazalakons = Frazalakon::query()
-        ->when(! $user, fn ($q) => $q->where('public', true))
+        ->when(! $user?->is_admin, fn ($q) => $q->where('public', true))
         ->orderByDesc('heart_count')
-        ->limit(47)
-        ->get();
+        ->paginate(20)
+        ->withQueryString();
 
     $likedIds = $user ? $user->likedFrazalakons()->pluck('frazalakon_id')->all() : [];
 
-    $frazalakons = $frazalakons->map(fn ($fzk) => array_merge($fzk->toArray(), [
+    $frazalakons->through(fn ($fzk) => array_merge($fzk->toArray(), [
         'is_liked' => in_array($fzk->id, $likedIds),
     ]));
 
@@ -66,7 +66,7 @@ Route::get('/random', function () {
     $user = Auth::user();
 
     $frazalakon = Frazalakon::query()
-        ->when(! $user, fn ($q) => $q->where('public', true))
+        ->when(! $user?->is_admin, fn ($q) => $q->where('public', true))
         ->inRandomOrder()
         ->firstOrFail();
 
@@ -172,11 +172,58 @@ Route::post('/{frazalakon}/like', function (Frazalakon $frazalakon) {
     return back();
 })->middleware('auth')->name('frazalakon.like');
 
-Route::get('dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
 require __DIR__.'/settings.php';
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/pending', function () {
+        $user = Auth::user();
+        $likedIds = $user->likedFrazalakons()->pluck('frazalakon_id')->all();
+
+        $frazalakons = Frazalakon::where('public', false)
+            ->latest('created_at')
+            ->paginate(20)
+            ->withQueryString();
+
+        $frazalakons->through(fn ($fzk) => array_merge($fzk->toArray(), [
+            'is_liked' => in_array($fzk->id, $likedIds),
+        ]));
+
+        return Inertia::render('Admin/Pending', [
+            'frazalakons' => $frazalakons,
+        ]);
+    })->name('admin.pending');
+
+    Route::put('/frazalakons/{frazalakon}', function (Request $request, Frazalakon $frazalakon) {
+        $validated = $request->validate([
+            'body' => 'required|string|min:3',
+            'who' => 'required|string|min:1',
+            'towho' => 'nullable|string',
+            'context' => 'nullable|string',
+            'where' => 'nullable|string',
+            'when' => 'nullable|date',
+            'public' => 'boolean',
+        ]);
+
+        $frazalakon->update($validated);
+
+        return back();
+    })->name('admin.frazalakons.update');
+
+    Route::delete('/frazalakons/{frazalakon}', function (Frazalakon $frazalakon) {
+        $frazalakon->delete();
+
+        return redirect()->route('home');
+    })->name('admin.frazalakons.destroy');
+
+    Route::post('/frazalakons/{frazalakon}/publish', function (Frazalakon $frazalakon) {
+        $frazalakon->update([
+            'public' => true,
+            'published_at' => now(),
+        ]);
+
+        return back();
+    })->name('admin.frazalakons.publish');
+});
 
 // Slug catch-all must be last to avoid conflicts with named routes
 Route::get('/{frazalakon}', function (Frazalakon $frazalakon) {

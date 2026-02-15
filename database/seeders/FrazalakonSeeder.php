@@ -25,7 +25,7 @@ class FrazalakonSeeder extends Seeder
 
         $columns = [
             'id', 'user_id', 'group_id', 'body', 'who', 'towho',
-            'context', 'where', 'when', 'author', 'validated_at',
+            'context', 'where', 'when', 'author', 'published_at',
             'public', 'heart_count', 'created_at', 'updated_at',
         ];
 

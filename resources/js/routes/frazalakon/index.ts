@@ -75,7 +75,7 @@ likeForm.post = (args: { frazalakon: string | { slug: string } } | [frazalakon: 
 like.form = likeForm
 
 /**
-* @see routes/web.php:182
+* @see routes/web.php:229
 * @route '/{frazalakon}'
 */
 export const show = (args: { frazalakon: string | { slug: string } } | [frazalakon: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -89,7 +89,7 @@ show.definition = {
 } satisfies RouteDefinition<["get","head"]>
 
 /**
-* @see routes/web.php:182
+* @see routes/web.php:229
 * @route '/{frazalakon}'
 */
 show.url = (args: { frazalakon: string | { slug: string } } | [frazalakon: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions) => {
@@ -121,7 +121,7 @@ show.url = (args: { frazalakon: string | { slug: string } } | [frazalakon: strin
 }
 
 /**
-* @see routes/web.php:182
+* @see routes/web.php:229
 * @route '/{frazalakon}'
 */
 show.get = (args: { frazalakon: string | { slug: string } } | [frazalakon: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -130,7 +130,7 @@ show.get = (args: { frazalakon: string | { slug: string } } | [frazalakon: strin
 })
 
 /**
-* @see routes/web.php:182
+* @see routes/web.php:229
 * @route '/{frazalakon}'
 */
 show.head = (args: { frazalakon: string | { slug: string } } | [frazalakon: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -139,7 +139,7 @@ show.head = (args: { frazalakon: string | { slug: string } } | [frazalakon: stri
 })
 
 /**
-* @see routes/web.php:182
+* @see routes/web.php:229
 * @route '/{frazalakon}'
 */
 const showForm = (args: { frazalakon: string | { slug: string } } | [frazalakon: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -148,7 +148,7 @@ const showForm = (args: { frazalakon: string | { slug: string } } | [frazalakon:
 })
 
 /**
-* @see routes/web.php:182
+* @see routes/web.php:229
 * @route '/{frazalakon}'
 */
 showForm.get = (args: { frazalakon: string | { slug: string } } | [frazalakon: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -157,7 +157,7 @@ showForm.get = (args: { frazalakon: string | { slug: string } } | [frazalakon: s
 })
 
 /**
-* @see routes/web.php:182
+* @see routes/web.php:229
 * @route '/{frazalakon}'
 */
 showForm.head = (args: { frazalakon: string | { slug: string } } | [frazalakon: string | { slug: string } ] | string | { slug: string }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
