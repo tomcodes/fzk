@@ -111,5 +111,5 @@ networks:
         external: true
         name: reverse-proxy
     reverb-network:
-        driver: bridge
+        external: true
         name: reverb

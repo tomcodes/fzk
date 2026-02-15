@@ -43,7 +43,7 @@ defineProps<{
                     href="/random"
                     class="text-sm text-muted-foreground hover:text-foreground"
                 >
-                    Random
+                    Aléatoire
                 </Link>
                 <Link
                     href="/denonciation"
@@ -61,21 +61,21 @@ defineProps<{
                     :href="dashboard()"
                     class="text-sm text-muted-foreground hover:text-foreground"
                 >
-                    Dashboard
+                    Tableau de bord
                 </Link>
                 <template v-else>
                     <Link
                         :href="login()"
                         class="text-sm text-muted-foreground hover:text-foreground"
                     >
-                        Log in
+                        Connexion
                     </Link>
                     <Link
                         v-if="canRegister"
                         :href="register()"
                         class="text-sm text-muted-foreground hover:text-foreground"
                     >
-                        Register
+                        Inscription
                     </Link>
                 </template>
             </nav>
