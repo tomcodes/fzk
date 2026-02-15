@@ -5,12 +5,17 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import NavBar from '@/components/NavBar.vue';
 
+const props = defineProps<{
+    captchaQuestion: string;
+}>();
+
 const form = useForm({
     body: '',
     who: '',
     towho: '',
     context: '',
     where: '',
+    captcha: '',
 });
 
 function submit() {
@@ -30,7 +35,7 @@ function submit() {
 
             <Card>
                 <CardContent class="pt-6">
-                    <form class="space-y-4" @submit.prevent="submit">
+                    <form class="space-y-8" @submit.prevent="submit">
                         <div>
                             <label
                                 for="body"
@@ -113,6 +118,27 @@ function submit() {
                                 v-model="form.where"
                                 placeholder="Lieu (optionnel)"
                             />
+                        </div>
+
+                        <div>
+                            <label
+                                for="captcha"
+                                class="mb-1 block text-sm font-medium"
+                            >
+                                {{ captchaQuestion }}
+                            </label>
+                            <Input
+                                id="captcha"
+                                v-model="form.captcha"
+                                placeholder="Ta réponse..."
+                                autocomplete="off"
+                            />
+                            <p
+                                v-if="form.errors.captcha"
+                                class="mt-1 text-sm text-destructive"
+                            >
+                                {{ form.errors.captcha }}
+                            </p>
                         </div>
 
                         <Button

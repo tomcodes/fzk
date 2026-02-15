@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-vue-next';
 import NavBar from '@/components/NavBar.vue';
+import { login, register } from '@/routes';
 import FrazalakonCard from '@/components/FrazalakonCard.vue';
 import type { Frazalakon } from '@/components/FrazalakonCard.vue';
 
@@ -34,6 +35,8 @@ const props = withDefaults(
         canRegister: boolean;
         frazalakons: PaginatedData;
         search: string;
+        totalCount: number;
+        publishedCount: number;
     }>(),
     {
         canRegister: true,
@@ -65,9 +68,29 @@ function goToPage(page: number) {
 <template>
     <Head title="Frazalakon" />
     <div class="min-h-screen bg-background text-foreground">
-        <NavBar :can-register="canRegister" />
+        <NavBar />
 
         <main class="mx-auto max-w-3xl px-4 py-8">
+            <p class="mb-6 text-sm text-muted-foreground">
+                {{ publishedCount }} publiée{{ publishedCount > 1 ? 's' : '' }} · {{ totalCount }} au total
+            </p>
+
+            <div v-if="!$page.props.auth.user" class="mb-6 flex items-center gap-3">
+                <Link
+                    :href="login()"
+                    class="rounded-lg border border-primary bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
+                >
+                    Connexion
+                </Link>
+                <Link
+                    v-if="canRegister"
+                    :href="register()"
+                    class="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary hover:bg-primary/15"
+                >
+                    Inscription
+                </Link>
+            </div>
+
             <div class="relative mb-6">
                 <Search
                     class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
@@ -87,7 +110,7 @@ function goToPage(page: number) {
                     :href="`/${fzk.slug}`"
                     class="block"
                 >
-                    <div class="rounded-lg border border-border p-4 transition-colors hover:border-primary/30 hover:bg-accent/50">
+                    <div class="rounded-lg border border-border p-4 transition-colors hover:border-primary hover:bg-primary/15">
                         <FrazalakonCard :frazalakon="fzk" />
                     </div>
                 </Link>

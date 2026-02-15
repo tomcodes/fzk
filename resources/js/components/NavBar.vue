@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { dashboard, login, register } from '@/routes';
-
-defineProps<{
-    canRegister?: boolean;
-}>();
+import { dashboard } from '@/routes';
 </script>
 
 <template>
@@ -17,18 +13,7 @@ defineProps<{
             <Link href="/" class="text-lg font-semibold hover:text-primary">
                 Frazalakon
             </Link>
-            <nav class="flex items-center gap-3">
-                <Link
-                    href="/"
-                    class="text-sm text-muted-foreground hover:text-foreground"
-                    :class="{
-                        'text-foreground font-medium':
-                            $page.url === '/' ||
-                            $page.url.startsWith('/?'),
-                    }"
-                >
-                    Accueil
-                </Link>
+            <nav class="flex items-center gap-8">
                 <Link
                     href="/top-47"
                     class="text-sm text-muted-foreground hover:text-foreground"
@@ -47,35 +32,17 @@ defineProps<{
                 </Link>
                 <Link
                     href="/denonciation"
-                    class="text-sm text-muted-foreground hover:text-foreground"
-                    :class="{
-                        'text-foreground font-medium':
-                            $page.url.startsWith('/denonciation'),
-                    }"
+                    class="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
                 >
                     Dénonciation anonyme
                 </Link>
-                <span class="mx-1 text-border">|</span>
-                <Link
-                    v-if="$page.props.auth.user"
-                    :href="dashboard()"
-                    class="text-sm text-muted-foreground hover:text-foreground"
-                >
-                    Tableau de bord
-                </Link>
-                <template v-else>
+                <template v-if="$page.props.auth.user">
+                    <span class="mx-1 text-border">|</span>
                     <Link
-                        :href="login()"
+                        :href="dashboard()"
                         class="text-sm text-muted-foreground hover:text-foreground"
                     >
-                        Connexion
-                    </Link>
-                    <Link
-                        v-if="canRegister"
-                        :href="register()"
-                        class="text-sm text-muted-foreground hover:text-foreground"
-                    >
-                        Inscription
+                        Tableau de bord
                     </Link>
                 </template>
             </nav>

@@ -25,7 +25,7 @@ defineProps<{
                     :href="`/${fzk.slug}`"
                     class="block"
                 >
-                    <div class="rounded-lg border border-border p-4 transition-colors hover:border-primary/30 hover:bg-accent/50">
+                    <div class="rounded-lg border border-border p-4 transition-colors hover:border-primary hover:bg-primary/15">
                         <FrazalakonCard :frazalakon="fzk" />
                     </div>
                 </Link>
